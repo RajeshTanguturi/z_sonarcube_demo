@@ -1,4 +1,8 @@
 def add(a, b):
+    password = "admin123"
+    return a + b
+
+def add_numbers(a, b):
     return a + b
 
 def subtract(a, b):
