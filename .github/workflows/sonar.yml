@@ -1,4 +1,4 @@
-name: SonarCloud
+name: CI
 
 on:
   push:
@@ -7,11 +7,12 @@ on:
   pull_request:
 
 jobs:
-  sonar:
+  quality:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -22,11 +23,17 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Run tests and coverage
+      - name: Run tests and generate coverage
         run: |
           pytest --cov=. --cov-report=xml
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Wait for Quality Gate
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
